@@ -1,17 +1,413 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Game Library</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Library — 20 offline arcade games for Solana Seeker</title>
+<meta name="description" content="Game Library is a premium offline arcade dApp for Solana Seeker. 20 cartoon games, 1000+ levels each, pay-once unlocks. Available on the Solana dApp Store.">
+<link rel="icon" type="image/png" href="assets/images/icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Fredoka',system-ui,-apple-system,sans-serif;
+    color:#1f1233;
+    background:linear-gradient(180deg,#ffd6a5 0%,#ff8fb1 38%,#a78bfa 78%,#7c5cff 100%);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* ---------- Confetti background ---------- */
+  .confetti{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .confetti span{position:absolute;border-radius:50%;opacity:.55;animation:float 12s ease-in-out infinite}
+  .confetti span:nth-child(1){left:8%;top:10%;width:14px;height:14px;background:#fde047}
+  .confetti span:nth-child(2){left:80%;top:20%;width:18px;height:18px;background:#7df09d;animation-delay:-2s}
+  .confetti span:nth-child(3){left:30%;top:70%;width:12px;height:12px;background:#42d3ff;animation-delay:-4s}
+  .confetti span:nth-child(4){left:60%;top:80%;width:16px;height:16px;background:#ff9aaa;animation-delay:-6s}
+  .confetti span:nth-child(5){left:90%;top:55%;width:10px;height:10px;background:#fff;animation-delay:-8s}
+  .confetti span:nth-child(6){left:5%;top:45%;width:20px;height:20px;background:#ffe45c;animation-delay:-3s}
+  .confetti span:nth-child(7){left:48%;top:25%;width:8px;height:8px;background:#a78bfa;animation-delay:-7s}
+  .confetti span:nth-child(8){left:18%;top:88%;width:14px;height:14px;background:#34d399;animation-delay:-1s}
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(0)}
+    50%{transform:translateY(-30px) rotate(180deg)}
+  }
+
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Top bar ---------- */
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 0;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{
+    width:54px;height:54px;border-radius:14px;
+    box-shadow:0 8px 22px rgba(124,28,160,.35);
+    border:3px solid rgba(255,255,255,.7);
+  }
+  .brand .name{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;font-size:24px;color:#fff;
+    text-shadow:2px 2px 0 rgba(124,28,160,.45);
+  }
+  nav.top-nav{display:flex;gap:18px}
+  nav.top-nav a{
+    text-decoration:none;color:#fff;font-weight:700;font-size:15px;
+    background:rgba(255,255,255,.18);padding:10px 16px;border-radius:999px;
+    border:2px solid rgba(255,255,255,.45);
+    transition:transform .15s ease,background .15s ease;
+  }
+  nav.top-nav a:hover{transform:translateY(-2px);background:rgba(255,255,255,.32)}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    text-align:center;padding:60px 0 40px;
+  }
+  .hero .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.85);color:#7c5cff;
+    border:2px solid #fff;border-radius:999px;
+    padding:8px 16px;font-weight:700;font-size:13px;
+    box-shadow:0 6px 20px rgba(124,28,160,.25);
+  }
+  .hero h1{
+    font-family:'Baloo 2',sans-serif;font-weight:800;
+    font-size:clamp(38px,7vw,72px);color:#fff;line-height:1.1;
+    margin:18px 0 14px;
+    text-shadow:4px 4px 0 rgba(124,28,160,.4),0 12px 30px rgba(0,0,0,.2);
+  }
+  .hero p{
+    color:#fff;max-width:680px;margin:0 auto;
+    font-size:clamp(15px,2vw,18px);font-weight:500;line-height:1.55;
+    opacity:.95;
+  }
+  .cta-row{
+    display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+    margin-top:30px;
+  }
+  .cta{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:16px 28px;border-radius:999px;
+    font-weight:800;font-size:16px;text-decoration:none;
+    transition:transform .15s ease,box-shadow .15s ease;
+    border:3px solid rgba(255,255,255,.55);
+  }
+  .cta.primary{
+    background:linear-gradient(135deg,#ffd166,#ff6b9d);
+    color:#1f1233;box-shadow:0 10px 28px rgba(255,107,157,.45);
+  }
+  .cta.secondary{
+    background:rgba(255,255,255,.92);color:#7c5cff;
+    box-shadow:0 10px 28px rgba(124,92,255,.3);
+  }
+  .cta:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(0,0,0,.25)}
+
+  .hero-icon{
+    margin:48px auto 0;display:block;
+    width:min(280px,60vw);height:auto;
+    border-radius:48px;
+    box-shadow:0 30px 60px rgba(124,28,160,.4),0 0 0 8px rgba(255,255,255,.3);
+    transform:rotate(-4deg);
+    transition:transform .3s ease;
+  }
+  .hero-icon:hover{transform:rotate(0deg) scale(1.04)}
+
+  /* ---------- Stat strip ---------- */
+  .stats{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:16px;margin:60px 0 20px;
+  }
+  .stat{
+    background:rgba(255,255,255,.92);border-radius:24px;padding:22px;
+    text-align:center;border:3px solid #fff;
+    box-shadow:0 12px 30px rgba(124,28,160,.18);
+  }
+  .stat .num{
+    font-family:'Baloo 2',sans-serif;font-weight:800;
+    font-size:42px;background:linear-gradient(135deg,#ff6b9d,#7c5cff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    line-height:1;
+  }
+  .stat .label{margin-top:6px;font-weight:600;color:#5b3a64;font-size:14px}
+
+  /* ---------- Section ---------- */
+  section{padding:60px 0}
+  section h2{
+    font-family:'Baloo 2',sans-serif;font-weight:800;
+    font-size:clamp(28px,4vw,42px);color:#fff;text-align:center;
+    margin:0 0 8px;
+    text-shadow:3px 3px 0 rgba(124,28,160,.35);
+  }
+  section p.lede{
+    text-align:center;color:#fff;opacity:.95;
+    max-width:640px;margin:0 auto 36px;font-size:16px;font-weight:500;
+  }
+
+  /* ---------- Game grid ---------- */
+  .games{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:14px;
+  }
+  .game{
+    background:linear-gradient(180deg,#ffffff 0%,#fff5fb 100%);
+    border-radius:22px;padding:18px 14px;text-align:center;
+    border:3px solid #fff;
+    box-shadow:0 10px 22px rgba(124,28,160,.18);
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .game:hover{transform:translateY(-4px) rotate(-1deg);box-shadow:0 18px 32px rgba(124,28,160,.28)}
+  .game .emoji{font-size:38px;line-height:1;display:block;margin-bottom:8px}
+  .game .gname{font-weight:700;color:#1f1233;font-size:14px}
+  .game .gtag{font-size:11px;color:#7c5cff;font-weight:600;margin-top:2px;letter-spacing:.4px;text-transform:uppercase}
+
+  /* ---------- Features ---------- */
+  .features{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;
+  }
+  .feature{
+    background:rgba(255,255,255,.94);border-radius:24px;padding:24px;
+    border:3px solid #fff;box-shadow:0 12px 26px rgba(124,28,160,.18);
+  }
+  .feature .icon{
+    width:54px;height:54px;border-radius:16px;
+    background:linear-gradient(135deg,#ff8fb1,#7c5cff);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;margin-bottom:14px;
+    box-shadow:0 6px 16px rgba(124,92,255,.4);
+  }
+  .feature h3{margin:0 0 6px;font-family:'Baloo 2',sans-serif;font-weight:800;color:#1f1233;font-size:18px}
+  .feature p{margin:0;color:#5b3a64;font-size:14px;line-height:1.5}
+
+  /* ---------- Solana panel ---------- */
+  .solana{
+    background:linear-gradient(135deg,#1a0033 0%,#3d0a6b 50%,#0a1f4d 100%);
+    border-radius:32px;padding:42px;color:#fff;
+    margin:20px 0;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+    border:3px solid rgba(255,255,255,.18);
+    text-align:center;
+  }
+  .solana h2{color:#fff;text-shadow:none}
+  .solana .pill{
+    display:inline-block;background:linear-gradient(135deg,#9945ff,#14f195);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:12px;
+    color:#000;letter-spacing:.5px;margin-bottom:12px;
+  }
+  .solana p{color:#cbb6ff;font-size:15px;max-width:580px;margin:10px auto 22px;line-height:1.6}
+  .solana .wallet{
+    display:inline-block;background:rgba(255,255,255,.08);
+    border:2px solid rgba(153,69,255,.5);
+    border-radius:14px;padding:14px 22px;
+    font-family:'SF Mono',Monaco,monospace;font-size:13px;
+    color:#a78bfa;word-break:break-all;
+  }
+
+  /* ---------- Promise grid ---------- */
+  .promise{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;max-width:640px;
+    margin-left:auto;margin-right:auto;
+  }
+  .promise div{
+    background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);
+    border-radius:16px;padding:14px;font-size:13px;color:#e0d4ff;
+    text-align:left;
+  }
+  .promise div::before{content:"✓ ";color:#14f195;font-weight:800}
+
+  /* ---------- Footer ---------- */
+  footer{
+    background:linear-gradient(180deg,transparent 0%,rgba(31,18,51,.92) 30%);
+    color:#fff;padding:60px 0 30px;margin-top:60px;
+  }
+  .footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start}
+  .footer-grid .brand{flex-direction:column;align-items:flex-start;gap:14px}
+  .footer-grid .brand .name{color:#fff;text-shadow:none}
+  .footer-grid p{color:#cbb6ff;font-size:14px;line-height:1.6;margin:0;max-width:340px}
+
+  ul.legal{
+    list-style:none;padding:0;margin:0;
+    display:flex;flex-direction:column;gap:12px;
+  }
+  ul.legal li a{
+    display:inline-flex;align-items:center;gap:10px;
+    color:#fff;text-decoration:none;font-weight:600;font-size:15px;
+    background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);
+    border-radius:999px;padding:10px 18px;
+    transition:background .15s ease;
+  }
+  ul.legal li a:hover{background:rgba(255,255,255,.18)}
+  ul.legal li a::before{content:"→";opacity:.6}
+
+  .copy{
+    border-top:1px solid rgba(255,255,255,.15);
+    margin-top:30px;padding-top:20px;
+    text-align:center;color:#9a8cb8;font-size:13px;
+  }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:680px){
+    nav.top-nav{display:none}
+    .footer-grid{grid-template-columns:1fr}
+    .promise{grid-template-columns:1fr}
+    .solana{padding:30px 22px}
+  }
+</style>
 </head>
 <body>
-  <h1>Game Library</h1>
 
-  <p>Welcome to Game Library.</p>
+<div class="confetti">
+  <span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span>
+</div>
 
-  <ul>
-    <li><a href="privacy.html">Privacy Policy</a></li>
-    <li><a href="license.html">License</a></li>
-    <li><a href="copyright.html">Copyright</a></li>
-  </ul>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <img src="assets/images/icon.png" alt="Game Library logo">
+      <span class="name">Game Library</span>
+    </div>
+    <nav class="top-nav">
+      <a href="#games">Games</a>
+      <a href="#features">Features</a>
+      <a href="#solana">Solana</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <span class="badge">🎮 20 GAMES · OFFLINE · NO ADS · NO REWARDS</span>
+    <h1>A pocket arcade for the<br>Solana Seeker.</h1>
+    <p>Twenty hand-crafted cartoon games — Snake, Connect 4, 2048, Reversi, Pong, Snakes &amp; Ladders and more — with a thousand procedurally generated levels each. Pay once with SOL to unlock premium content; play forever, fully offline.</p>
+    <div class="cta-row">
+      <a class="cta primary" href="#dapp-store">⬇ Get on the dApp Store</a>
+      <a class="cta secondary" href="#games">View all 20 games</a>
+    </div>
+    <img class="hero-icon" src="assets/images/icon.png" alt="Game Library app icon showing 20 cartoon mini-games">
+  </section>
+
+  <div class="stats">
+    <div class="stat"><div class="num">20</div><div class="label">Hand-crafted games</div></div>
+    <div class="stat"><div class="num">20K+</div><div class="label">Procedural levels</div></div>
+    <div class="stat"><div class="num">100%</div><div class="label">Offline gameplay</div></div>
+    <div class="stat"><div class="num">0</div><div class="label">Ads · trackers · rewards</div></div>
+  </div>
+
+  <section id="games">
+    <h2>Twenty cartoon games</h2>
+    <p class="lede">Every game has a tutorial, multiple modes, increasing difficulty, and a thousand procedurally generated premium levels you unlock once.</p>
+    <div class="games">
+      <div class="game"><span class="emoji">🐍</span><div class="gname">Snake</div><div class="gtag">Arcade</div></div>
+      <div class="game"><span class="emoji">🔴</span><div class="gname">Connect 4</div><div class="gtag">Board</div></div>
+      <div class="game"><span class="emoji">⚫</span><div class="gname">Reversi</div><div class="gtag">Board</div></div>
+      <div class="game"><span class="emoji">🎲</span><div class="gname">Snakes &amp; Ladders</div><div class="gtag">Board</div></div>
+      <div class="game"><span class="emoji">🏗️</span><div class="gname">Tower Stack</div><div class="gtag">Arcade</div></div>
+      <div class="game"><span class="emoji">❌</span><div class="gname">Tic Tac Toe</div><div class="gtag">Board</div></div>
+      <div class="game"><span class="emoji">⚫</span><div class="gname">Checkers</div><div class="gtag">Board</div></div>
+      <div class="game"><span class="emoji">💣</span><div class="gname">Minesweeper</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🔢</span><div class="gname">2048</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🃏</span><div class="gname">Memory Match</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🧱</span><div class="gname">Block Puzzle</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🔤</span><div class="gname">Word Grid</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🌀</span><div class="gname">Maze Runner</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🧪</span><div class="gname">Color Sort</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🔢</span><div class="gname">Sliding Puzzle</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🏓</span><div class="gname">Pong</div><div class="gtag">Arcade</div></div>
+      <div class="game"><span class="emoji">🧱</span><div class="gname">Breakout</div><div class="gtag">Arcade</div></div>
+      <div class="game"><span class="emoji">🫧</span><div class="gname">Bubble Pop</div><div class="gtag">Arcade</div></div>
+      <div class="game"><span class="emoji">💡</span><div class="gname">Lights Out</div><div class="gtag">Puzzle</div></div>
+      <div class="game"><span class="emoji">🎵</span><div class="gname">Simon Says</div><div class="gtag">Arcade</div></div>
+    </div>
+  </section>
+
+  <section id="features">
+    <h2>Built for Seeker, made to feel arcade</h2>
+    <p class="lede">No live-service nonsense. No leaderboards selling your data. No staking. Just twenty premium games that respect your time.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="icon">🎨</div>
+        <h3>Cartoon polish</h3>
+        <p>Animated game cards, smooth transitions, light + neon dark themes, and a unique colour palette per game.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📚</div>
+        <h3>Tutorial for everything</h3>
+        <p>Every game and every mode ships with a full step-by-step tutorial overlay you can replay any time from the pause menu.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🤖</div>
+        <h3>Rule-based bots</h3>
+        <p>Vs Bot mode in supported games uses simple deterministic rules — no AI, no servers, fully offline, infinitely fair.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🧩</div>
+        <h3>1,000+ levels per game</h3>
+        <p>Levels are generated from a tiny seed + difficulty + variant config. Stable across replays, no giant assets to download.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">♾️</div>
+        <h3>Infinite mode</h3>
+        <p>Endless-run variants for Snake and other arcade games. Survive as long as you can — no goal, just chase your best.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🌗</div>
+        <h3>Light + neon dark</h3>
+        <p>Cheerful daytime palette and a neon arcade nighttime mode. System theme by default, override any time.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="solana">
+    <div class="solana">
+      <span class="pill">⚡ Built on Solana</span>
+      <h2>Pay once. Yours forever.</h2>
+      <p>The wallet is only used to unlock premium content. There are no rewards, no staking, no payouts, no token. Your SOL goes straight to the developer's address — no marketplace fee, no escrow.</p>
+      <div class="wallet">7Hcsb4AZHMBEE71Vk1H5sSExfewUzbnZm5B4WT4YzXMf</div>
+      <div class="promise">
+        <div>Players never earn money</div>
+        <div>No gambling. Ever.</div>
+        <div>No AI models — bots are rule-based</div>
+        <div>All gameplay works offline</div>
+        <div>Wallet only used for unlocks</div>
+        <div>Owner wallet sees everything free</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dapp-store">
+    <h2>Available on the Solana dApp Store</h2>
+    <p class="lede">Game Library is built for the Solana Seeker and distributed through the Solana dApp Store. Install once, play offline forever.</p>
+    <div class="cta-row">
+      <a class="cta primary" href="#" rel="noopener">⬇ Open in dApp Store</a>
+      <a class="cta secondary" href="#features">Why it's different</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="brand">
+          <img src="assets/images/icon.png" alt="Game Library logo" style="width:48px;height:48px;border-radius:12px;border:3px solid rgba(255,255,255,.5)">
+          <span class="name">Game Library</span>
+        </div>
+        <p>A premium offline arcade dApp for Solana Seeker. Twenty cartoon games, one wallet, zero nonsense.</p>
+      </div>
+      <div>
+        <h3 style="margin:0 0 14px;font-family:'Baloo 2',sans-serif;font-size:18px;color:#fff">Legal</h3>
+        <ul class="legal">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="license.html">License</a></li>
+          <li><a href="copyright.html">Copyright</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">© 2026 Game Library. Built for the Solana Seeker. SOL, the Solana logo, and Seeker are trademarks of their respective owners.</div>
+  </div>
+</footer>
+
 </body>
 </html>
